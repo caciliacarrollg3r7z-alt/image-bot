@@ -1,0 +1,1597 @@
+version: 2.1
+
+jobs:
+  canary_t-01:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Index byte offsets
+          command: |
+            mkdir -p /tmp/ci-ws
+            set +o pipefail 2>/dev/null; seq 1 926281 | md5sum > /tmp/ci-ws/step-30.out; true
+            size=$(wc -c </tmp/ci-ws/step-30.out); echo "stage ok: t-01 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-30.out
+  t-01:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/step-30.out > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  p2_py311-lint:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect env snapshot
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 465767 | sha1sum; true ; } > /tmp/ci-ws/01.out
+            size=$(wc -c </tmp/ci-ws/01.out); echo "stage ok: py311-lint size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 01.out
+  py311-lint:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/01.out > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  ctx2_bravo-2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Weigh batch output
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes 'line' | head -n 194143 | awk '{print NR, $0}' | tail -1; true ; } > /tmp/ci-ws/18.out
+            size=$(wc -c </tmp/ci-ws/18.out); echo "stage ok: bravo-2 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 18.out
+  bravo-2:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/18.out > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  db_jul17-ship:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Build adjacency map
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 406966 | sha1sum; true ; } > /tmp/ci-ws/trace.log
+            size=$(wc -c </tmp/ci-ws/trace.log); echo "stage ok: jul17-ship size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - trace.log
+  jul17-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/trace.log > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  canary_Launch_Pipeline6:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Checkpoint context
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes abc | head -n 212983 | sha256sum; true ; } > /tmp/ci-ws/phase-ok.out
+            size=$(wc -c </tmp/ci-ws/phase-ok.out); echo "stage ok: Launch_Pipeline6 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - phase-ok.out
+  Launch_Pipeline6:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/phase-ok.out > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  kick_callisto-rc:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Fold data streams
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes abc | head -n 453484 | sha256sum; true ; } > /tmp/ci-ws/20.bin
+            size=$(wc -c </tmp/ci-ws/20.bin); echo "stage ok: callisto-rc size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 20.bin
+  callisto-rc:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/20.bin > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  provision_add-dashboard:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Expand parameter grid
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes abc | head -n 280868 | sha256sum; true ; } > /tmp/ci-ws/.marker
+            size=$(wc -c </tmp/ci-ws/.marker); echo "stage ok: add-dashboard size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .marker
+  add-dashboard:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/.marker > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  rerun_ValidateTests:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect retire counts
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{p=1;for(i=1;i<=134500;i++)p=(p*i)%1000000007;print p}'; true ; } > /tmp/ci-ws/big_phase_output.out
+            size=$(wc -c </tmp/ci-ws/big_phase_output.out); echo "stage ok: ValidateTests size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - big_phase_output.out
+  ValidateTests:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/big_phase_output.out > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  canary1_update-login:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pivot result stream
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 496257 | awk '{if($1%2)o++;else e++}END{print o"/"e}'; true ; } > /tmp/ci-ws/2023-12-08.data
+            size=$(wc -c </tmp/ci-ws/2023-12-08.data); echo "stage ok: update-login size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2023-12-08.data
+  update-login:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/2023-12-08.data > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  tap_green-light:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Flush pipeline cache
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 18874368 /dev/urandom | md5sum; true ; } > /tmp/ci-ws/155.txt
+            size=$(wc -c </tmp/ci-ws/155.txt); echo "stage ok: green-light size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 155.txt
+  green-light:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/155.txt > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  Delta_yolo:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Harvest random seed
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(a=1;a<=3;a++)for(b=1;b<=23836;b++)s+=a*b;print s}'; true ; } > /tmp/ci-ws/output.md
+            size=$(wc -c </tmp/ci-ws/output.md); echo "stage ok: yolo size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - output.md
+  yolo:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  teardown_sierra:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Enumerate line counts
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{p=1;for(i=1;i<=1952400;i++)p=(p*i)%1000000007;print p}'; true ; } > /tmp/ci-ws/OK
+            size=$(wc -c </tmp/ci-ws/OK); echo "stage ok: sierra size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - OK
+  sierra:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/OK > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  precheck_jun24-ship:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Scan vector span
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 190960 | paste - - - - | wc -l; true ; } > /tmp/ci-ws/handoff.sig
+            size=$(wc -c </tmp/ci-ws/handoff.sig); echo "stage ok: jun24-ship size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handoff.sig
+  jun24-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/handoff.sig > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  preflight_q2-ship:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Verify fixture integrity
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc '0-9A-F' </dev/urandom | head -c 512000 | fold -w4 | sort -R 2>/dev/null | head -c 200 || true; echo done; true ; } > /tmp/ci-ws/step-pass.log
+            size=$(wc -c </tmp/ci-ws/step-pass.log); echo "stage ok: q2-ship size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-pass.log
+  q2-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/step-pass.log > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  reup_min-smoke:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Prepare block cipher
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 13631488 /dev/urandom | sha256sum; true ; } > /tmp/ci-ws/cache.bin
+            size=$(wc -c </tmp/ci-ws/cache.bin); echo "stage ok: min-smoke size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - cache.bin
+  min-smoke:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  canary1_CORE-872:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collate dictionary rows
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc '0-9A-F' </dev/urandom | head -c 245760 | fold -w4 | sort -R 2>/dev/null | head -c 200 || true; echo done; true ; } > /tmp/ci-ws/log.txt
+            size=$(wc -c </tmp/ci-ws/log.txt); echo "stage ok: CORE-872 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - log.txt
+  CORE-872:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/log.txt > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  syncer_ship-it:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Project latency curve
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/zero bs=1M count=6 2>/dev/null | gzip -9 | wc -c; true ; } > /tmp/ci-ws/handoff.ok
+            size=$(wc -c </tmp/ci-ws/handoff.ok); echo "stage ok: ship-it size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handoff.ok
+  ship-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/handoff.ok > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  wire_q4-cleanup:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Snapshot heap stats
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 17825792 /dev/urandom | gzip -1 | wc -c; true ; } > /tmp/ci-ws/relay.txt
+            size=$(wc -c </tmp/ci-ws/relay.txt); echo "stage ok: q4-cleanup size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - relay.txt
+  q4-cleanup:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  blue_RunStaging:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Mix shuffle salt
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 7340032 /dev/urandom | tar cz - 2>/dev/null | wc -c; true ; } > /tmp/ci-ws/gate-ready.txt
+            size=$(wc -c </tmp/ci-ws/gate-ready.txt); echo "stage ok: RunStaging size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - gate-ready.txt
+  RunStaging:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/gate-ready.txt > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  prep_build:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Compile stats index
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'a-z' </dev/urandom | head -c 2097152 | fold -w16 | sort -u | wc -l; true ; } > /tmp/ci-ws/stats.json
+            size=$(wc -c </tmp/ci-ws/stats.json); echo "stage ok: build size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - stats.json
+  build:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  round2_check-end-to-end-test-matrix:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Precompute lookup
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 176287 | tr '0-9' 'a-j' | wc -c; true ; } > /tmp/ci-ws/.ok
+            size=$(wc -c </tmp/ci-ws/.ok); echo "stage ok: check-end-to-end-test-matrix size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .ok
+  check-end-to-end-test-matrix:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  prebuild_STG_MERGE_9:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Churn allocator pool
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{srand();s=0;for(i=0;i<64356;i++)s+=rand();printf "%.4f\n",s}'; true ; } > /tmp/ci-ws/2023-07-02.data
+            size=$(wc -c </tmp/ci-ws/2023-07-02.data); echo "stage ok: STG_MERGE_9 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2023-07-02.data
+  STG_MERGE_9:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/2023-07-02.data > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  canary_anothr-run:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Score branch coverage
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 2 10114 | factor | wc -l; true ; } > /tmp/ci-ws/secondary_task_output_v1.txt
+            size=$(wc -c </tmp/ci-ws/secondary_task_output_v1.txt); echo "stage ok: anothr-run size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - secondary_task_output_v1.txt
+  anothr-run:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/secondary_task_output_v1.txt > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  hydrate_pat-ship:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect gauge frames
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 853328 | awk 'NR%15==0{sum+=$1}END{print sum}'; true ; } > /tmp/ci-ws/passoff.txt
+            size=$(wc -c </tmp/ci-ws/passoff.txt); echo "stage ok: pat-ship size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - passoff.txt
+  pat-ship:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/passoff.txt > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  syncer_update-queue:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Flush temp bucket
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes 'line' | head -n 67860 | awk '{print NR, $0}' | tail -1; true ; } > /tmp/ci-ws/counts.csv
+            size=$(wc -c </tmp/ci-ws/counts.csv); echo "stage ok: update-queue size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - counts.csv
+  update-queue:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/counts.csv > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  inspect_phoenix-rc:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Mint sequence identifier
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( for i in $(seq 1 11651); do printf "%08x\n" $RANDOM; done ) | sort | md5sum; true ; } > /tmp/ci-ws/main_job_output_v1.log
+            size=$(wc -c </tmp/ci-ws/main_job_output_v1.log); echo "stage ok: phoenix-rc size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - main_job_output_v1.log
+  phoenix-rc:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/main_job_output_v1.log > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  verify_fix-3076:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Build summary row
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 30408704 /dev/urandom | sha256sum; true ; } > /tmp/ci-ws/ckpt-C.pt
+            size=$(wc -c </tmp/ci-ws/ckpt-C.pt); echo "stage ok: fix-3076 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - ckpt-C.pt
+  fix-3076:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/stats.json > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  orchestrate_phoenix-alpha:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Trim trailing newlines
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 239492 | awk 'NR%3==0{sum+=$1}END{print sum}'; true ; } > /tmp/ci-ws/metrics.csv
+            size=$(wc -c </tmp/ci-ws/metrics.csv); echo "stage ok: phoenix-alpha size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - metrics.csv
+  phoenix-alpha:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/metrics.csv > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  warmer_RolloutPipeline:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inflate reference set
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes abc | head -n 99244 | sha256sum; true ; } > /tmp/ci-ws/.ready
+            size=$(wc -c </tmp/ci-ws/.ready); echo "stage ok: RolloutPipeline size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .ready
+  RolloutPipeline:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/.ready > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+  retry_q3-cleanup:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Fingerprint vendor tree
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<490275;i++) printf "%d\n", (i*7919)%2147483647}' | wc -l; true ; } > /tmp/ci-ws/64.blob
+            size=$(wc -c </tmp/ci-ws/64.blob); echo "stage ok: q3-cleanup size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 64.blob
+  q3-cleanup:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inspect pre-stage
+          command: |
+            { head -n 5 /tmp/ci-ws/64.blob > /dev/null; echo "lines ok" ; } || true
+      - run:
+          name: Grab repository
+          command: git clone --depth 2 -q --single-branch --filter=blob:none --no-tags https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Fetch fixtures
+          command: tar -I gzip -xf build-dist.tgz
+      - run:
+          name: Package artifacts
+          command: g++ --version
+      - run:
+          no_output_timeout: 99m
+          command: taskset -c 0-3 ./wrapper
+
+  cook_ValidateTests_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Chunk raw buffer
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 481251 | awk 'END{print NR}'; true ; } > /tmp/ci-ws/big_phase_output.out
+            size=$(wc -c </tmp/ci-ws/big_phase_output.out); echo "stage ok: ValidateTests size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - big_phase_output.out
+  loader_callisto-rc_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect byte metrics
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes "x$RANDOM" | head -n 480647 | md5sum; true ; } > /tmp/ci-ws/20.bin
+            size=$(wc -c </tmp/ci-ws/20.bin); echo "stage ok: callisto-rc size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 20.bin
+  postcheck_CORE-872_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Format readable table
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'a-z0-9 ' </dev/urandom | head -c 512000 | tr ' ' '\n' | sort | uniq | wc -l; true ; } > /tmp/ci-ws/log.txt
+            size=$(wc -c </tmp/ci-ws/log.txt); echo "stage ok: CORE-872 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - log.txt
+  generate_green-light_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Reconcile output files
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes abc | head -n 309855 | sha256sum; true ; } > /tmp/ci-ws/155.txt
+            size=$(wc -c </tmp/ci-ws/155.txt); echo "stage ok: green-light size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 155.txt
+  teardown_jun24-ship_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Record manifest digest
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( echo "hdr"; seq 1 77060; echo "ftr" ) | wc -l; true ; } > /tmp/ci-ws/handoff.sig
+            size=$(wc -c </tmp/ci-ws/handoff.sig); echo "stage ok: jun24-ship size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handoff.sig
+  prefetch_update-queue_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Fold integer series
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | head -c 2048000 | base64 | head -c 200 | wc -c; true ; } > /tmp/ci-ws/counts.csv
+            size=$(wc -c </tmp/ci-ws/counts.csv); echo "stage ok: update-queue size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - counts.csv
+  resync_q3-cleanup_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Enumerate token pairs
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 22400 | awk '{print $1*$1}' | sha1sum | cut -c1-24; true ; } > /tmp/ci-ws/64.blob
+            size=$(wc -c </tmp/ci-ws/64.blob); echo "stage ok: q3-cleanup size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 64.blob
+  syncer_phoenix-rc_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Audit path segments
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'a-z0-9 ' </dev/urandom | head -c 1638400 | tr ' ' '\n' | sort | uniq | wc -l; true ; } > /tmp/ci-ws/main_job_output_v1.log
+            size=$(wc -c </tmp/ci-ws/main_job_output_v1.log); echo "stage ok: phoenix-rc size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - main_job_output_v1.log
+  Gamma_ship-it_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Spool byte frames
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 12M /dev/urandom | base64 | wc -c; true ; } > /tmp/ci-ws/handoff.ok
+            size=$(wc -c </tmp/ci-ws/handoff.ok); echo "stage ok: ship-it size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handoff.ok
+  round2_py311-lint_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pack vendor fragments
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 13631488 /dev/urandom | gzip -1 | wc -c; true ; } > /tmp/ci-ws/01.out
+            size=$(wc -c </tmp/ci-ws/01.out); echo "stage ok: py311-lint size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 01.out
+  vendor_Launch_Pipeline6_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Rotate build log
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 16777216 /dev/urandom | od -An -x | wc -w; true ; } > /tmp/ci-ws/phase-ok.out
+            size=$(wc -c </tmp/ci-ws/phase-ok.out); echo "stage ok: Launch_Pipeline6 size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - phase-ok.out
+  alpha_anothr-run_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Reorder index entries
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 8388608 /dev/urandom | tar cz - 2>/dev/null | wc -c; true ; } > /tmp/ci-ws/secondary_task_output_v1.txt
+            size=$(wc -c </tmp/ci-ws/secondary_task_output_v1.txt); echo "stage ok: anothr-run size=${size}"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - secondary_task_output_v1.txt
+workflows:
+  main:
+    jobs:
+      - rerun_ValidateTests
+      - cook_ValidateTests_2:
+          requires:
+            - rerun_ValidateTests
+      - ValidateTests:
+          requires:
+            - cook_ValidateTests_2
+      - kick_callisto-rc:
+          requires:
+            - cook_ValidateTests_2
+      - loader_callisto-rc_2:
+          requires:
+            - kick_callisto-rc
+      - callisto-rc:
+          requires:
+            - loader_callisto-rc_2
+      - canary1_CORE-872:
+          requires:
+            - loader_callisto-rc_2
+      - postcheck_CORE-872_2:
+          requires:
+            - canary1_CORE-872
+      - CORE-872:
+          requires:
+            - postcheck_CORE-872_2
+      - tap_green-light:
+          requires:
+            - postcheck_CORE-872_2
+      - generate_green-light_2:
+          requires:
+            - tap_green-light
+      - green-light:
+          requires:
+            - generate_green-light_2
+      - prep_build
+      - round2_check-end-to-end-test-matrix
+      - build:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - check-end-to-end-test-matrix:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - fix-3076:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - yolo:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - q4-cleanup:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - min-smoke:
+          requires:
+            - prep_build
+            - round2_check-end-to-end-test-matrix
+      - precheck_jun24-ship
+      - teardown_jun24-ship_2:
+          requires:
+            - precheck_jun24-ship
+      - jun24-ship:
+          requires:
+            - teardown_jun24-ship_2
+      - syncer_update-queue:
+          requires:
+            - teardown_jun24-ship_2
+      - prefetch_update-queue_2:
+          requires:
+            - syncer_update-queue
+      - update-queue:
+          requires:
+            - prefetch_update-queue_2
+      - retry_q3-cleanup:
+          requires:
+            - prefetch_update-queue_2
+      - resync_q3-cleanup_2:
+          requires:
+            - retry_q3-cleanup
+      - q3-cleanup:
+          requires:
+            - resync_q3-cleanup_2
+      - inspect_phoenix-rc:
+          requires:
+            - resync_q3-cleanup_2
+      - syncer_phoenix-rc_2:
+          requires:
+            - inspect_phoenix-rc
+      - phoenix-rc:
+          requires:
+            - syncer_phoenix-rc_2
+      - syncer_ship-it:
+          requires:
+            - syncer_phoenix-rc_2
+      - Gamma_ship-it_2:
+          requires:
+            - syncer_ship-it
+      - ship-it:
+          requires:
+            - Gamma_ship-it_2
+      - p2_py311-lint:
+          requires:
+            - Gamma_ship-it_2
+      - round2_py311-lint_2:
+          requires:
+            - p2_py311-lint
+      - py311-lint:
+          requires:
+            - round2_py311-lint_2
+      - canary_Launch_Pipeline6:
+          requires:
+            - round2_py311-lint_2
+      - vendor_Launch_Pipeline6_2:
+          requires:
+            - canary_Launch_Pipeline6
+      - Launch_Pipeline6:
+          requires:
+            - vendor_Launch_Pipeline6_2
+      - canary_anothr-run:
+          requires:
+            - vendor_Launch_Pipeline6_2
+      - alpha_anothr-run_2:
+          requires:
+            - canary_anothr-run
+      - anothr-run:
+          requires:
+            - alpha_anothr-run_2
+      - preflight_q2-ship
+      - q2-ship:
+          requires:
+            - preflight_q2-ship
+      - canary_t-01:
+          requires:
+            - preflight_q2-ship
+      - t-01:
+          requires:
+            - canary_t-01
+      - orchestrate_phoenix-alpha:
+          requires:
+            - canary_t-01
+      - phoenix-alpha:
+          requires:
+            - orchestrate_phoenix-alpha
+      - provision_add-dashboard:
+          requires:
+            - orchestrate_phoenix-alpha
+      - add-dashboard:
+          requires:
+            - provision_add-dashboard
+      - teardown_sierra:
+          requires:
+            - provision_add-dashboard
+      - sierra:
+          requires:
+            - teardown_sierra
+      - blue_RunStaging:
+          requires:
+            - teardown_sierra
+      - RunStaging:
+          requires:
+            - blue_RunStaging
+      - ctx2_bravo-2:
+          requires:
+            - blue_RunStaging
+      - bravo-2:
+          requires:
+            - ctx2_bravo-2
+      - prebuild_STG_MERGE_9:
+          requires:
+            - ctx2_bravo-2
+      - STG_MERGE_9:
+          requires:
+            - prebuild_STG_MERGE_9
+      - hydrate_pat-ship:
+          requires:
+            - prebuild_STG_MERGE_9
+      - pat-ship:
+          requires:
+            - hydrate_pat-ship
+      - db_jul17-ship:
+          requires:
+            - hydrate_pat-ship
+      - jul17-ship:
+          requires:
+            - db_jul17-ship
+      - warmer_RolloutPipeline:
+          requires:
+            - db_jul17-ship
+      - RolloutPipeline:
+          requires:
+            - warmer_RolloutPipeline
+      - canary1_update-login:
+          requires:
+            - warmer_RolloutPipeline
+      - update-login:
+          requires:
+            - canary1_update-login
